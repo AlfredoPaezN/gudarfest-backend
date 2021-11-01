@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  web:
+    restart: always
+    build: ./gudarfest
+    expose:
+      - "8000"
+    volumes:
+      - web-django:/usr/src/app
+      - web-static:/usr/src/app/static
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+    command: /usr/local/bin/gunicorn config.wsgi:application -w 2 -b :8000
+
+  nginx:
+    restart: always
+    build: ./local/
+    ports:
+      - "8081:8081"
+    volumes:
+      - web-static:/www/static
+    links:
+      - web:web
+
+volumes:
+  web-django:
+  web-static:
+  redisdata:
